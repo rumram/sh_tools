@@ -83,7 +83,7 @@ ulimit -n 4096
 
 if [ "${TRIM}" = "U" ] && [ "$INDEX" ]
 	then
-	for i in $(find $READS/*.fastq.gz -type f -printf "%f\n")
+	for i in $(find $READS/*.fastq.gz -type f -printf "%f\n") #need to add use only unique values so that wont run every sample twice
 	do
 		echo "Mapping sample" "${i%%_*}"
 		$STAR --genomeDir $INDEX \
