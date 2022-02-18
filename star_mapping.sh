@@ -83,36 +83,31 @@ ulimit -n 4096
 
 if [ "${TRIM}" = "U" ] && [ "$INDEX" ]
 	then
-	for i in $(find $READS/*.fastq.gz -type f -printf "%f\n") #need to add use only unique values so that wont run every sample twice
+	for i in $(find $READS/*.fastq.gz -type f -printf "%f\n" | sed 's/\.1.*//;s/_1.*//;s/\.2.*//;s/_2.*//' | sort -u)
 	do
-		echo "Mapping sample" "${i%%_*}"
+		echo "Mapping sample" "${i}"
 		$STAR --genomeDir $INDEX \
 		--runMode alignReads \
 		--readFilesCommand gunzip -c \
-		--readFilesIn $READS/"${i%%_*}"_1.fastq.gz $READS/"${i%%_*}"_2.fastq.gz \
+		--readFilesIn $READS/"${i}"_1.fastq.gz $READS/"${i}"_2.fastq.gz \
 		--runThreadN 60 \
 		--outSAMtype BAM SortedByCoordinate \
-		--outFileNamePrefix Star_mapped/"${i%%_*}"
+		--outFileNamePrefix Star_mapped/"${i}"
 	done
 
 elif [ "${TRIM}" = "U" ] && [ -z "$INDEX" ]
         then
-        for i in $(find $READS/*.fastq.gz -type f -printf "%f\n")
+        for i in $(find $READS/*.fastq.gz -type f -printf "%f\n" | sed 's/\.1.*//;s/_1.*//;s/\.2.*//;s/_2.*//' | sort -u)
         do
-                echo "Mapping sample" "${i%%_*}"
+                echo "Mapping sample" "${i}"
                 $STAR --genomeDir $PWD/Star_index \
                 --runMode alignReads \
                 --readFilesCommand gunzip -c \
-                --readFilesIn $READS/"${i%%_*}"_1.fastq.gz $READS/"${i%%_*}"_2.fastq.gz \
+                --readFilesIn $READS/"${i}"_1.fastq.gz $READS/"${i}"_2.fastq.gz \
                 --runThreadN 60 \
                 --outSAMtype BAM SortedByCoordinate \
-                --outFileNamePrefix Star_mapped/"${i%%_*}"
+                --outFileNamePrefix Star_mapped/"${i}"
         done
-
-#KO1-3_1_1.fastq.gz
-#KO1-3_1.fastq.gz
-#rawData2/KO1-3_1.fastq.gz_1.fastq.gz
-#"${i%%.*}
 
 elif [ "${TRIM}" = "T" ] && [ "$INDEX" ]
 	then
